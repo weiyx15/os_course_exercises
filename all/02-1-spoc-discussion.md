@@ -42,6 +42,8 @@
 
 - x86中在UEFI中的可信启动有什么作用？
 
+  通过数字证书保证安全启动
+
 - RV中BBL的启动过程大致包括哪些内容？
 
   - 系统上电，BIOS自检、初始化硬件
@@ -70,7 +72,10 @@
 
 - 以ucore/rcore lab8的answer为例，ucore的系统调用有哪些？大致的功能分类有哪些？
 
-  ucore的系统调用有
+  - 进程管理: sys_exit, sys_fork, sys_wait, sys_exec, sys_yield, sys_kill, sys_getpid,  sys_gettime, sys_lab6_set_priority, sys_sleep
+  - 文件管理: sys_open, sys_close, sys_read, sys_write, sys_seek, sys_fstat, sys_fsync, sys_getcwd, sys_getdirentry, sys_dup 
+  - 外设管理: sys_putc
+  - 内存管理: sys_pgdir      
 
 ## 3.4 linux系统调用分析
 - 通过分析[lab1_ex0](https://github.com/chyyuu/ucore_lab/blob/master/related_info/lab1/lab1-ex0.md)了解Linux应用的系统调用编写和含义。(仅实践，不用回答)
@@ -85,7 +90,16 @@
 
 ## 3.6 请分析函数调用和系统调用的区别
 - 系统调用与函数调用的区别是什么？
+
+  - 系统调用和函数调用的汇编指令不同
+  - 系统调用时发生堆栈切换和特权级切换
+
 - 通过分析x86中函数调用规范以及`int`、`iret`、`call`和`ret`的指令准确功能和调用代码，比较x86中函数调用与系统调用的堆栈操作有什么不同？
+
+  函数调用时，不切换堆栈，call指令向堆栈压入新的栈帧，栈帧记录未进入函数前的下一条指令地址CS和EIP，ret指令弹出新栈帧
+
+  系统调用时，int指令从用户进程堆栈切换到内核堆栈，在内核堆栈的栈帧中不仅要记录未进入函数前的下一条指令地址CS和EIP，还要记录用户进程堆栈地址SS和ESP，iret指令根据SS和ESP从内核堆栈切换到相应的用户进程堆栈，并根据CS和EIP执行下一条指令。
+
 - 通过分析RV中函数调用规范以及`ecall`、`eret`、`jal`和`jalr`的指令准确功能和调用代码，比较x86中函数调用与系统调用的堆栈操作有什么不同？
 
 
